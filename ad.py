@@ -25,7 +25,7 @@ except ImportError:
     from PIL import Image
 
 #excel 받아오기
-excel_document = openpyxl.load_workbook('/home/pi/projects/opencv-CFR-advertisement-system-Linux/data.xlsx')
+excel_document = openpyxl.load_workbook('/home/pi/projects/opencv-CFR-advertisement-system-rpi/data.xlsx')
 excel_document.get_sheet_names()
 sheet = excel_document.get_sheet_by_name('Sheet1')
 
@@ -184,7 +184,7 @@ while True:
         else:
             ori = frame.copy()  # 나중에 frame 의 원본을 쓰기 위해 ori 에 복사한 것으로 얼굴을 인식시킨다.
             img_gray = cv2.cvtColor(ori, cv2.COLOR_BGR2GRAY)
-            cascade_file = "/home/pi/projects/opencv-CFR-advertisement-system-Linux/haarcascade_frontalface_default.xml"  # https://github.com/opencv/opencv/tree/master/data/haarcascades xml파일 다운경로
+            cascade_file = "/home/pi/projects/opencv-CFR-advertisement-system-rpi/haarcascade_frontalface_default.xml"  # https://github.com/opencv/opencv/tree/master/data/haarcascades xml파일 다운경로
             cascade = cv2.CascadeClassifier(cascade_file)
             face_list = cascade.detectMultiScale(img_gray, scaleFactor=1.1, minNeighbors=3,
                                                  minSize=(50, 50))  # 가까이있는 얼굴 인식하고싶어서 150으로 올려둠 멀리있는 얼굴 인식하려면 낮추기
@@ -205,7 +205,7 @@ while True:
                     # imgpath = ('C:/Users/dbstn/Desktop/nene/cropimg%d.jpg' % (imgnum))
 
                     crop = frame  # crop 이지만 크롭하지 않은 전체 이미지를 저장해서 CFR이 인식하도록 함. 추후 수정필요
-                    imgpath = ('/home/pi/projects/opencv-CFR-advertisement-system-Linux/crop/img%d.png' % (imgnum))
+                    imgpath = ('/home/pi/projects/opencv-CFR-advertisement-system-rpi/crop/img%d.png' % (imgnum))
                     imgnum = imgnum + 1
                     cv2.imwrite(imgpath, crop)
                     files = {'image': open(imgpath, 'rb')}
