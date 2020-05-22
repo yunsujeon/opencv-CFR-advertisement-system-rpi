@@ -1,12 +1,21 @@
-#from skimage.viewer import ImageViewer
-#from skimage.io import imread
+import numpy as np
 import cv2
 import pyautogui
+
+screen_id = 0
+
+print ('a')
+# get the size of the screen
 width, height = pyautogui.size()
-img = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-Linux/sst/snow.png',cv2.IMREAD_COLOR) #path to IMG
-#view = ImageViewer(img)
-#view.show()
-img_resized = cv2.resize(img,dsize=(width,height),interpolation=cv2.INTER_LINEAR)
-cv2.imshow('img',img_resized)
-cv2.waitKey(0)
+print (width)
+print (height)
+image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/snow.png')
+
+window_name = 'projector'
+cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+cv2.moveWindow(window_name, width, height)
+cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,
+                      cv2.WINDOW_FULLSCREEN)
+cv2.imshow(window_name, image)
+cv2.waitKey()
 cv2.destroyAllWindows()

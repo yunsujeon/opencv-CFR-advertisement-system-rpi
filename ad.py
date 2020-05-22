@@ -12,8 +12,8 @@ import json
 import subprocess
 import speech_recognition as sr
 import pygame
-#from moviepy.editor import VideoFileClip
-from moviepy.editor import *
+from moviepy.editor import VideoFileClip
+#from moviepy.editor import *
 import pyautogui
 import openpyxl
 import random
