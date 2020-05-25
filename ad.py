@@ -1,7 +1,5 @@
+#!/bin/sh
 # -*- coding: utf-8 -*-
-#NAVER clova face recognition CFR
-#결과를 엑셀 또는 서버에 저장하도록 하기
-#영상처리를 먼저 해서 얼굴이 걸리면 CFR을 실행하도록 하기
 import requests
 import os
 import sys
@@ -41,36 +39,42 @@ imgnum = 0
 width, height = pyautogui.size()
 print (width)
 print (height)
-pygame.init()
+#pygame.init()
 
-# 영상은 클라우드에 / 조건과 이에따른 영상제목은 엑셀,office에 / 코드상 조건이 맞으면 엑셀,office 가서 랜덤으로 영상제목을 읽어온다 / 클라우드 접속하여 그 영상을 불러온다.
-# 얼굴인식 코드를 지나 CFR을 했을 때 얼굴이 err 이나 frontal img 이외의 이미지일때는 다시 얼굴인식 코드를 하게끔 수정
 
-def recognize_speech_from_mic(recognizer, microphone): #stt함수
+def recognize_speech_from_mic(recognizer, microphone):
+
     if not isinstance(recognizer, sr.Recognizer):
         raise TypeError("`recognizer` must be `Recognizer` instance")
+
     if not isinstance(microphone, sr.Microphone):
         raise TypeError("`microphone` must be `Microphone` instance")
+
     with microphone as source:
-        recognizer.adjust_for_ambient_noise(source) # #  analyze the audio source for 1 second
+        recognizer.adjust_for_ambient_noise(source,duration=1)
+        #recognizer.adjust_for_ambient_noise(source)
+        print("say something")
+        #audio = recognizer.listen(source,timeout=3)
         audio = recognizer.listen(source)
     response = {
         "success": True,
         "error": None,
         "transcription": None
     }
+
     try:
-        response["transcription"] = recognizer.recognize_google(audio)
+        response["transcription"] = recognizer.recognize_google(audio, language='en=US')
     except sr.RequestError:
         # API was unreachable or unresponsive
         response["success"] = False
-        response["error"] = "API unavailable/unresponsive"
+        response["error"] = "API unavailable"
     except sr.UnknownValueError:
         # speech was unintelligible
         response["error"] = "Unable to recognize speech"
+
     return response
 
-#def recognize(audio):
+#def recognize_speech_from_mic(audio):
 #    try:
 #        return r.recognize_google(audio,language='en=US')
 #    except sr.UnknownValueError:
@@ -84,7 +88,8 @@ def facerecog(faceposes, agelens, firstages, facegenders):
     end=0
     iagelens = int(agelens)
     ifirstages = int(firstages)
-    if faceposes == "frontal_face":
+    if faceposes == "frontal_face" or "left_face" or "right_face" or "rotate_face" :
+        faceposenum = 1
         if iagelens is 5:
             if ifirstages is 1:
                 if facegenders == ("male"or"child"): #남자10대
@@ -159,24 +164,32 @@ def facerecog(faceposes, agelens, firstages, facegenders):
                     selectnum = 21
                     start = 3
                     end = 62
+    else:
+        faceposenum = 2
+
     while cell is None:
-        print (start)
-        print (end)
-        if start<=end:
-            manrownum = random.randrange (start,end)
-        else:
-            manrownum = random.randrange(end,start)
-        print(manrownum, selectnum)
-        cell = sheet.cell(row=manrownum, column=selectnum).value
-    return cell
+        if faceposenum ==1:
+            print (start)
+            print (end)
+            if start<=end:
+                manrownum = random.randrange(start, end)
+            else:
+                manrownum = random.randrange(end, start)
+            print(manrownum, selectnum)
+            cell = sheet.cell(row=manrownum, column=selectnum).value
+            err = 0
+        else :
+            cell = None
+            err = 1
+    return cell, err
 
 while True:
     if framenum == 2:
         framenum = 0
     else:
         framenum = framenum + 1
-    ret, frame = cap.read()
 
+    ret, frame = cap.read()
     if ret:
         if cv2.waitKey(1) & 0xFF == ord('q'):
             #sys.exit(0)
@@ -237,44 +250,47 @@ while True:
 
  # 6번문제. 여기서 문제점 : harsscade에서 얼굴을 인식했는데 그 crop 이미지를 불러왔을때 CFR이 보기에 분석이 불가능하다면 팅김 > 다시 앞으로 돌아가는 알고리즘 필요
                         
-                        cel = facerecog(facepose, agelen, firstage, facegender)
-                        print (cel)
+                        cel, err = facerecog(facepose, agelen, firstage, facegender)
+                        if err ==0 :
+                            print (cel)
+                            cel = cel[:-4] 
+                            clip1 = VideoFileClip('/home/pi/Downloads/'+cel+'1'+'.mp4')
+                            clip2 = VideoFileClip('/home/pi/Downloads/'+cel+'2'+'.mp4')
+                            clip1_resized = clip1.resize(height=height-20, width=width)
+                            clip2_resized = clip1.resize(height=height-20, width=width)
+                            #pygame.display.set_mode((width,height))
+                            #pygame.display.set_caption('first video!')
+                            clip1_resized.preview()  # 작은화면 디버깅시 이용
+                            #clip1.preview(fullscreen=True)
+                            #clip1_resized.close()
+                            pygame.quit()
+                            p = subprocess.Popen('python imviewer.py',shell=True)
                         
-                        clip1 = VideoFileClip('/home/pi/Downloads/'+cel)
-                        clip2 = VideoFileClip('/home/pi/Downloads/'+cel)
-                        clip1_resized = clip1.resize(height=height-30, width=width)
-                        clip2_resized = clip1.resize(height=height-30, width=width)
-                        #pygame.display.set_mode((width,height))
-                        #pygame.display.set_caption('first video!')
-                        clip1_resized.preview()  # 작은화면 디버깅시 이용
-                        # clip1.preview(fullscreen=True) # 모든화면에서 풀스크린으로 되면 하기 but 팅기더라
-                        pygame.quit()
-                        p = subprocess.Popen('python imviewer.py',shell=True)
+                            while True:
+                                recognizer = sr.Recognizer()
+                                mic = sr.Microphone(device_index=5)# device_index
+                                response = recognize_speech_from_mic(recognizer, mic)
+                                response2 = response['transcription']
+                                print (response)
+                                if response2 == "snow": 
+                                    print(response2)
+                                    p.kill()
+                                    break
+                                else:
+                                    print(response2)
                         
-                        #while True:
-                        #    recognizer = sr.Recognizer()
-                        #    mic = sr.Microphone(device_index=1)
-                        #    response = recognize_speech_from_mic(recognizer, mic)
-                        #    response2 = response['transcription']
-                        #    if response2 == "snow":  # snow 또는 now 또는 none 등등 예외를 많이 만들어놓기!!! 음성인식 정확도 %의 기준이 될것
-                        #        print(response2)
-                        #        p.kill()
-                        #        break
-                        #    else:
-                        #        print(response2)
-                        
-                        pygame.display.set_caption('second video!')
-                        clip2_resized.preview()  # 작은화면 디버깅시 이용
-                        # clip2.preview(fullscreen=True)
-                        pygame.quit()
-                        # clip2.close() # clip1.close 등 moviepy 명령어인 close 쓰니깐 느림. 팅기는 현상
-                    
+                            #pygame.display.set_caption('second video!')
+                            clip2_resized.preview()  # 작은화면 디버깅시 이용
+                            # clip2.preview(fullscreen=True)
+                            pygame.quit()
+                            #clip2_resized.close()
+                            # clip2.close() # clip1.close 등 moviepy 명령어인 close 쓰니깐 느림. 팅기는 현상
+                        else : 
+                            print("facepose error")
                     else:
                         print("Error Code:" + rescode)
-
-            # !!!!!!!!!!!!!!중요!!!!!!!!!!!!!!!
-            # else: # face list 가 없을 때 예외처리방법 작성 필요
-
+            else: # face list 가 없을 때 예외처리방법 작성 필요
+                print("no face list")
 cap.release()
 
 cv2.destroyAllWindows()
