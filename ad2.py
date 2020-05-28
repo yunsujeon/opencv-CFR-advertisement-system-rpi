@@ -15,12 +15,14 @@ import subprocess
 import speech_recognition as sr
 import pygame
 import pyautogui
-
+from rand import moviename
+import math
 try:
     import Image
 except ImportError:
     from PIL import Image
 
+print (moviename)
 # excel 받아오기
 excel_document = openpyxl.load_workbook('/home/pi/projects/opencv-CFR-advertisement-system-rpi/data.xlsx')
 excel_document.get_sheet_names()
@@ -39,7 +41,6 @@ width, height = pyautogui.size()
 print(width)
 print(height)
 pygame.init()  # 라이브러리 초기화 안해줘도 되긴함
-
 
 def recognize_speech_from_mic(recognizer, microphone):
     # check that recognizer and microphone arguments are appropriate type
@@ -80,6 +81,9 @@ def facerecog(facepose, smale, sfemale, max_male, max_female, facegender):
     cell = None
     start = 0
     end = 0
+    if facepose=='100' or smale == '100' or sfemale =='100' or max_male =='100' or max_female=='100' or facegender=='100':
+        faceposenum = 2
+        print ("recognize face error")
     if facepose == "frontal_face" or "left_face" or "right_face" or "rotate_face" : #여러명일때 facepose는 좀 이상한 감이 있지만..
         faceposenum = 1
         if smale > sfemale :
@@ -166,10 +170,11 @@ def facerecog(facepose, smale, sfemale, max_male, max_female, facegender):
         else:
             cell = None
             err = 1
+            break
     return cell, err
 
 while True:
-    if framenum == 2:
+    if framenum == 3:
         framenum = 0
     else:
         framenum = framenum + 1
@@ -192,7 +197,7 @@ while True:
 				# cv2.rectangle(frame, (x, y), (x + w, y + h), color[0], thickness=3) #n번째가 아닌 인식되는 즉시 즉시를 보려면 이 코드 사용
 				# cv2.imshow('video', frame)
 
-                if framenum == 2:  # 처음 얼굴을 인식했을 때 말고 시간이 약간 지난 후의 x 번째 프레임을 캡쳐한다.
+                if framenum == 3:  # 처음 얼굴을 인식했을 때 말고 시간이 약간 지난 후의 x 번째 프레임을 캡쳐한다.
                     cv2.rectangle(ori, (x, y), (x + w, y + h), color[0], thickness=3)
                     cv2.imshow('video', ori)
 
@@ -211,10 +216,14 @@ while True:
                     response = requests.post(url, files=files, headers=headers)
                     rescode = response.status_code
 
-                    facegender = []
-                    faceage = []
-
                     if (rescode == 200):
+                        facepose = '100'
+                        smale = '100'
+                        sfemale = '100'
+                        max_male = '100'
+                        max_female = '100'
+                        facegender = []
+                        faceage = []
                         print(response.text)
                         data = json.loads(response.text)  # https://developers.naver.com/docs/clova/api/CFR/API_Guide.md#%EC%9D%91%EB%8B%B5-2
                         faceCount = data['info']['faceCount']
@@ -256,7 +265,9 @@ while True:
                                     male[6] += 1
                                 elif 70 <= average_age[i] < 80:
                                     male[7] += 1
-                            else:
+                                else:
+                                    male[8] += 1
+                            elif facegender[i] == "female":
                                 if 1 <= average_age[i] < 10:
                                     female[0] += 1
                                 elif 10 <= average_age[i] < 20:
@@ -273,7 +284,36 @@ while True:
                                     female[6] += 1
                                 elif 70 <= average_age[i] < 80:
                                     female[7] += 1
-
+                                else:
+                                    female[8] += 1
+                            else:
+                                if 1 <= average_age[i] < 10:
+                                    male[0] += 0.5
+                                    female[0] += 0.5
+                                elif 10 <= average_age[i] < 20:
+                                    male[1] += 0.5
+                                    female[1] += 0.5
+                                elif 20 <= average_age[i] < 30:
+                                    male[2] += 0.5
+                                    female[2] += 0.5
+                                elif 30 <= average_age[i] < 40:
+                                    male[3] += 0.5
+                                    female[3] += 0.5			
+                                elif 40 <= average_age[i] < 50:
+                                    male[4] += 0.5
+                                    female[4] += 0.5
+                                elif 50 <= average_age[i] < 60:
+                                    male[5] += 0.5
+                                    female[5] += 0.5
+                                elif 60 <= average_age[i] < 70:
+                                    male[6] += 0.5
+                                    female[6] += 1
+                                elif 70 <= average_age[i] < 80:
+                                    male[7] += 0.5
+                                    female[7] += 0.5
+                                else:
+                                    male[8] += 0.5
+                                    female[8] += 0.5
                         max_male = 0
                         max_female = 0
                         for i in range(8):
@@ -289,7 +329,9 @@ while True:
                                 max_female = -1
 
                         smale = sum(male)
+                        smale = math.ceil(smale)
                         sfemale = sum(female)
+                        sfemale = math.ceil(sfemale)
                         print(male, female) # 남 녀 배열
                         print(smale, sfemale) # 남자 수 여자 수
                         print(max_male, max_female) # 성별별로 가장 많은 나이대
@@ -307,13 +349,13 @@ while True:
                             clip1_resized.preview()  # 작은화면 디버깅시 이용
                             # clip1.preview(fullscreen=True) # 모든화면에서 풀스크린으로 되면 하기 but 팅기더라
                             pygame.quit()
-                            p = subprocess.Popen('python imviewer.py', shell=True)
+                            p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE, shell=True)
                             while True:
                                 recognizer = sr.Recognizer()
                                 mic = sr.Microphone(device_index=5)
                                 response = recognize_speech_from_mic(recognizer, mic)
                                 response2 = response['transcription']
-                                if response2 == "snow":  # snow 또는 now 또는 none 등등 예외를 많이 만들어놓기!!! 음성인식 정확도 %의 기준이 될것
+                                if response2 == moviename:  # snow 또는 now 또는 none 등등 예외를 많이 만들어놓기!!! 음성인식 정확도 %의 기준이 될것
                                     print(response2)
                                     p.kill()
                                     break
