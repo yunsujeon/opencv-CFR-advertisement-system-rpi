@@ -16,6 +16,7 @@ import pyautogui
 import openpyxl
 import random
 #from moviepy.video.fx.resize import resize
+from rand import moviename
 
 try:
     import Image
@@ -88,7 +89,10 @@ def facerecog(faceposes, agelens, firstages, facegenders):
     end=0
     iagelens = int(agelens)
     ifirstages = int(firstages)
-    if faceposes == "frontal_face" or "left_face" or "right_face" or "rotate_face" :
+    if faceposes=='100' or agelens =='100' or firstages=='100' or facegenders=='100':
+        faceposenum = 2
+        print ("recognize face error")
+    elif faceposes == "frontal_face" or "left_face" or "right_face" or "rotate_face" :
         faceposenum = 1
         if iagelens is 5:
             if ifirstages is 1:
@@ -181,10 +185,11 @@ def facerecog(faceposes, agelens, firstages, facegenders):
         else :
             cell = None
             err = 1
+            break
     return cell, err
 
 while True:
-    if framenum == 2:
+    if framenum == 3:
         framenum = 0
     else:
         framenum = framenum + 1
@@ -210,7 +215,7 @@ while True:
                     # cv2.rectangle(frame, (x, y), (x + w, y + h), color[0], thickness=3) #n번째가 아닌 인식되는 즉시 즉시를 보려면 이 코드 사용
                 # cv2.imshow('video', frame)
 
-                if framenum == 2:  # 처음 얼굴을 인식했을 때 말고 시간이 약간 지난 후의 x 번째 프레임을 캡쳐한다.
+                if framenum == 3:  # 처음 얼굴을 인식했을 때 말고 시간이 약간 지난 후의 x 번째 프레임을 캡쳐한다.
                     cv2.rectangle(ori, (x, y), (x + w, y + h), color[0], thickness=3)
                     cv2.imshow('video', ori)
 
@@ -229,6 +234,10 @@ while True:
                     rescode = response.status_code
                     print("before rescode==200")
                     if (rescode == 200):
+                        facepose = '100'
+                        firstage = '100'
+                        facegender = '100'
+                        agelen = '100'
                         print(response.text)
                         data = json.loads(
                             response.text)  # https://developers.naver.com/docs/clova/api/CFR/API_Guide.md#%EC%9D%91%EB%8B%B5-2
@@ -249,11 +258,13 @@ while True:
                         # print("감지된 얼굴의 두번째 나이대는 {}0대 입니다.".format(secondage))
 
  # 6번문제. 여기서 문제점 : harsscade에서 얼굴을 인식했는데 그 crop 이미지를 불러왔을때 CFR이 보기에 분석이 불가능하다면 팅김 > 다시 앞으로 돌아가는 알고리즘 필요
+                        print (facepose, agelen, firstage, facegender)
                         
+
                         cel, err = facerecog(facepose, agelen, firstage, facegender)
                         if err ==0 :
                             print (cel)
-                            cel = cel[:-4] 
+                            cel = cel[:-4]
                             clip1 = VideoFileClip('/home/pi/Downloads/'+cel+'1'+'.mp4')
                             clip2 = VideoFileClip('/home/pi/Downloads/'+cel+'2'+'.mp4')
                             clip1_resized = clip1.resize(height=height-20, width=width)
@@ -264,15 +275,16 @@ while True:
                             #clip1.preview(fullscreen=True)
                             #clip1_resized.close()
                             pygame.quit()
-                            p = subprocess.Popen('python imviewer.py',shell=True)
-                        
+                            p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE,shell=True)
+                            print(moviename)
+                            #p=subprocess.Popen('python imviewer.py',shell=True)
                             while True:
                                 recognizer = sr.Recognizer()
                                 mic = sr.Microphone(device_index=5)# device_index
                                 response = recognize_speech_from_mic(recognizer, mic)
                                 response2 = response['transcription']
                                 print (response)
-                                if response2 == "snow": 
+                                if response2 == moviename: 
                                     print(response2)
                                     p.kill()
                                     break
