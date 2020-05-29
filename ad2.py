@@ -241,9 +241,13 @@ while True:
 
                         average_age = []
                         for i in range(faceCount):
-                            average_age.append(int(faceage[i][0] + faceage[i][1]) + 2)
-                            print(average_age[i])
-
+                            #age is over 10
+                            if len(faceage[i]) ==5:
+                                average_age.append(int(faceage[i][0] + faceage[i][1]) + 2)
+                            #age is under 10
+                            else:
+                                average_age.append(int(faceage[i][0]) + 2)
+                        
                         male = [0, 0, 0, 0, 0, 0, 0, 0, 0]
                         female = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -287,7 +291,7 @@ while True:
                                 else:
                                     female[8] += 1
                             else:
-                                if 1 <= average_age[i] < 10:
+                                if 1 <= average_age[i] < 10: #child일경우.10대이상부턴 오류이기 때문에  의미로 1이 아닌 조정된 가중치인 0.5를 부여
                                     male[0] += 0.5
                                     female[0] += 0.5
                                 elif 10 <= average_age[i] < 20:
