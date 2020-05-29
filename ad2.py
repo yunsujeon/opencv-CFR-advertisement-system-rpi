@@ -292,8 +292,8 @@ while True:
                                     female[8] += 1
                             else:
                                 if 1 <= average_age[i] < 10: #child일경우.10대이상부턴 오류이기 때문에  의미로 1이 아닌 조정된 가중치인 0.5를 부여
-                                    male[0] += 0.5
-                                    female[0] += 0.5
+                                    male[0] += 1
+                                    female[0] += 1
                                 elif 10 <= average_age[i] < 20:
                                     male[1] += 0.5
                                     female[1] += 0.5

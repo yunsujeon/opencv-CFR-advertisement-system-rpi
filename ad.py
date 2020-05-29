@@ -16,12 +16,12 @@ import pyautogui
 import openpyxl
 import random
 #from moviepy.video.fx.resize import resize
-from rand import moviename
-
 try:
     import Image
 except ImportError:
     from PIL import Image
+
+screen_id = 0
 
 #excel 받아오기
 excel_document = openpyxl.load_workbook('/home/pi/projects/opencv-CFR-advertisement-system-rpi/data.xlsx')
@@ -42,7 +42,6 @@ print (width)
 print (height)
 #pygame.init()
 
-
 def recognize_speech_from_mic(recognizer, microphone):
 
     if not isinstance(recognizer, sr.Recognizer):
@@ -57,6 +56,7 @@ def recognize_speech_from_mic(recognizer, microphone):
         print("say something")
         #audio = recognizer.listen(source,timeout=3)
         audio = recognizer.listen(source)
+        print("end recognize")    
     response = {
         "success": True,
         "error": None,
@@ -83,6 +83,57 @@ def recognize_speech_from_mic(recognizer, microphone):
 #        print("음성을 말해주세요")
 #        return ''
 
+def selectname(randnumb, response2):
+    print ("랜덤한 숫자 : "),randnumb
+    print ("실제로 음성 인식한 내용 : "),response2
+    correct = 2 
+    if (randnumb==0):
+        print("걸렸네1")
+        if(response2 ==('navigation' or 'vacation' or 'delegation' or 'randiation' or 'navigate' or 'Asian' or 'dedication' or 'definition' or 'litigation' or 'baby Asian' or 'reggaeton' or 'meditation' or 'vision' or 'Nick Cannon')):
+            correct = 1
+            print("걸렸네2")
+        else:
+            correct = 2
+            print("걸렸네3")
+    elif (randnumb==1):
+        if (response2 == ('happy birthday' or 'birthday' or 'divorcee' or 'North Bay' or 'Thursday' or 'PRCA' or 'Weber State')):
+            correct = 1
+            print("걸렸네4")
+        else :
+            correct = 2
+            print("걸렸네5")
+    elif (randnumb==2):
+        if (response2 ==('English' or 'ego-C' or 'ngozi' or 'Melissa' or 'NBC' or 'Embassy' or 'Blissey' or 'Khaleesi' or 'Chrissy' or "English C" or 'sushi' or 'Gracie')):
+            correct = 1
+            print("걸렸네6")
+        else :
+            correct = 2
+            print("걸렸네7")
+    elif (randnumb==3):
+        if (response2 == ('Museum' or 'medium' or 'idiom' or 'wake me up at' or 'video' or 'continuum' or 'rhenium' or 'resume' or 'iridium' or 'lithium' or 'potassium') ):
+            correct = 1
+            print("걸렸네8")
+        else :
+            correct = 2
+            print("걸렸네9")
+    elif (randnumb==4):
+        if (response2 == ('Coca-Cola' or 'Aquila' or 'koala' or 'popular' or 'Opera' or 'kookaburra' or 'Pablo' or 'Buffalo')):
+            correct = 1
+            print("걸렸네10")
+        else :
+            correct = 2
+            print("걸렸네11")
+    elif (randnumb==5):
+        if (response2 == ('Hawaii' or 'hi' or 'how are you')):
+            correct = 1
+            print("걸렸네12")
+        else :
+            correct = 2
+            print("걸렸네13")
+    else :
+        print ("please say again")
+    return correct
+        
 def facerecog(faceposes, agelens, firstages, facegenders):
     cell= None
     start=0
@@ -194,6 +245,20 @@ while True:
     else:
         framenum = framenum + 1
 
+    randnumb = random.randrange(0,6)
+    if randnumb == 0:
+        randname = 'navigation'
+    elif randnumb ==1:
+        randname = 'happybirthday'
+    elif randnumb ==2:
+        randname = 'english'
+    elif randnumb ==3:
+        randname = 'museum'
+    elif randnumb ==4:
+        randname = 'cocacola'
+    elif randnumb ==5:
+        randname = 'hawaii'
+
     ret, frame = cap.read()
     if ret:
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -260,7 +325,6 @@ while True:
  # 6번문제. 여기서 문제점 : harsscade에서 얼굴을 인식했는데 그 crop 이미지를 불러왔을때 CFR이 보기에 분석이 불가능하다면 팅김 > 다시 앞으로 돌아가는 알고리즘 필요
                         print (facepose, agelen, firstage, facegender)
                         
-
                         cel, err = facerecog(facepose, agelen, firstage, facegender)
                         if err ==0 :
                             print (cel)
@@ -268,29 +332,45 @@ while True:
                             clip1 = VideoFileClip('/home/pi/Downloads/'+cel+'1'+'.mp4')
                             clip2 = VideoFileClip('/home/pi/Downloads/'+cel+'2'+'.mp4')
                             clip1_resized = clip1.resize(height=height-20, width=width)
-                            clip2_resized = clip1.resize(height=height-20, width=width)
+                            clip2_resized = clip2.resize(height=height-20, width=width)
                             #pygame.display.set_mode((width,height))
                             #pygame.display.set_caption('first video!')
                             clip1_resized.preview()  # 작은화면 디버깅시 이용
                             #clip1.preview(fullscreen=True)
                             #clip1_resized.close()
                             pygame.quit()
-                            p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE,shell=True)
-                            print(moviename)
-                            #p=subprocess.Popen('python imviewer.py',shell=True)
+                            #p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE,shell=True)
+                            width, height = pyautogui.size()
+                            image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/'+randname+'.jpg')
+                            #cv2.imshow('image',image)
+                            #cv2.waitKey(1)
+                            print ("발음해야 할 단어 : " + randname)
+                            window_name = 'projector'
+                            cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                            cv2.moveWindow(window_name, width, height)
+                            cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+                            cv2.imshow(window_name, image)
+                            cv2.waitKey(100)
+                            
                             while True:
                                 recognizer = sr.Recognizer()
-                                mic = sr.Microphone(device_index=5)# device_index
+                                mic = sr.Microphone(device_index=2)# device_index
                                 response = recognize_speech_from_mic(recognizer, mic)
                                 response2 = response['transcription']
+                                correct = selectname(randnumb, response2)
                                 print (response)
-                                if response2 == moviename: 
-                                    print(response2)
-                                    p.kill()
+                                print (response2)
+                                print (correct)
+                                print("발음해야 할 단어 : " + randname)
+                                if correct == 1: 
+                                    print response2," >> 변환인식완료 >> ",randname
+                                    #p.kill()
                                     break
                                 else:
-                                    print(response2)
-                        
+                                    print response2," >> 다시 시도해주세요"
+                            print( "빠져나옴")        
+                            cv2.destroyAllWindows()
+
                             #pygame.display.set_caption('second video!')
                             clip2_resized.preview()  # 작은화면 디버깅시 이용
                             # clip2.preview(fullscreen=True)
@@ -301,7 +381,7 @@ while True:
                             print("facepose error")
                     else:
                         print("Error Code:" + rescode)
-            else: # face list 가 없을 때 예외처리방법 작성 필요
+            else:
                 print("no face list")
 cap.release()
 
