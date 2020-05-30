@@ -11,18 +11,16 @@ import json
 import random
 import openpyxl
 from moviepy.editor import VideoFileClip
-import subprocess
 import speech_recognition as sr
 import pygame
 import pyautogui
-from rand import moviename
 import math
 try:
     import Image
 except ImportError:
     from PIL import Image
+screen_id = 0
 
-print (moviename)
 # excel 받아오기
 excel_document = openpyxl.load_workbook('/home/pi/projects/opencv-CFR-advertisement-system-rpi/data.xlsx')
 excel_document.get_sheet_names()
@@ -40,7 +38,7 @@ imgnum = 0
 width, height = pyautogui.size()
 print(width)
 print(height)
-pygame.init()  # 라이브러리 초기화 안해줘도 되긴함
+#pygame.init()  # 라이브러리 초기화 안해줘도 되긴함
 
 def recognize_speech_from_mic(recognizer, microphone):
     # check that recognizer and microphone arguments are appropriate type
@@ -54,17 +52,13 @@ def recognize_speech_from_mic(recognizer, microphone):
         recognizer.adjust_for_ambient_noise(source,duration=1)
         print ("Say something!")
         audio = recognizer.listen(source)
-
+        print ("end recognition")
 	# set up the response object
     response = {
         "success": True,
         "error": None,
         "transcription": None
     }
-
-# try recognizing the speech in the recording
-# if a RequestError or UnknownValueError exception is caught,
-#     update the response object accordingly
     try:
         response["transcription"] = recognizer.recognize_google(audio)
     except sr.RequestError:
@@ -76,6 +70,44 @@ def recognize_speech_from_mic(recognizer, microphone):
         response["error"] = "Unable to recognize speech"
     return response
 
+def selectname(randnumb, response2):
+    print("랜덤한 숫자 : "), randnumb
+    print("실제로 음성 인식한 내용 : "), response2
+    correct = 2
+
+    if (randnumb == 0):
+        if response2 in ('navigation', 'vacation', 'delegation', 'randiation', 'navigate', 'Asian', 'dedication', 'definition', 'litigation', 'baby Asian', 'reggaeton', 'meditation', 'vision', 'Nick Cannon'):
+            correct = 1
+        else:
+            correct = 2
+    elif (randnumb == 1):
+        if response2 in ('happy birthday', 'birthday', 'divorcee', 'North Bay', 'Thursday', 'PRCA', 'Weber State'):
+            correct = 1
+        else:
+            correct = 2
+    elif (randnumb == 2):
+        if response2 in ('English', 'ego-C', 'ngozi', 'Melissa', 'NBC', 'Embassy', 'Blissey', 'Khaleesi', 'Chrissy', "English C", 'sushi', 'Gracie'):
+            correct = 1
+        else:
+            correct = 2
+    elif (randnumb == 3):
+        if response2 in ('Museum', 'medium', 'idiom', 'wake me up at', 'video', 'continuum', 'rhenium', 'resume', 'iridium', 'lithium', 'potassium'):
+            correct = 1
+        else:
+            correct = 2
+    elif (randnumb == 4):
+        if response2 in ('Coca-Cola', 'Aquila', 'koala', 'popular', 'Opera', 'kookaburra', 'Pablo', 'Buffalo'):
+            correct = 1
+        else:
+            correct = 2
+    elif (randnumb == 5):
+        if response2 in ('Hawaii', 'hi', 'how are you'):
+            correct = 1
+        else:
+            correct = 2
+    else:
+        print("please say again")
+    return correct
 
 def facerecog(facepose, smale, sfemale, max_male, max_female, facegender):
     cell = None
@@ -178,6 +210,21 @@ while True:
         framenum = 0
     else:
         framenum = framenum + 1
+
+    randnumb = random.randrange(0,6)
+    if randnumb == 0:
+        randname = 'navigation'
+    elif randnumb ==1:
+        randname = 'happybirthday'
+    elif randnumb ==2:
+        randname = 'english'
+    elif randnumb ==3:
+        randname = 'museum'
+    elif randnumb ==4:
+        randname = 'cocacola'
+    elif randnumb ==5:
+        randname = 'hawaii'
+
     ret, frame = cap.read()
     if ret:
         if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -353,18 +400,38 @@ while True:
                             clip1_resized.preview()  # 작은화면 디버깅시 이용
                             # clip1.preview(fullscreen=True) # 모든화면에서 풀스크린으로 되면 하기 but 팅기더라
                             pygame.quit()
-                            p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE, shell=True)
+                            #p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE, shell=True)
+                            width, height = pyautogui.size()
+                            image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/'+randname+'.jpg')
+                            #cv2.imshow('image',image)
+                            #cv2.waitKey(1)
+                            print ("발음해야 할 단어 : " + randname)
+                            window_name = 'projector'
+                            cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                            cv2.moveWindow(window_name, width, height)
+                            cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+                            cv2.imshow(window_name, image)
+                            cv2.waitKey(500)
+
                             while True:
                                 recognizer = sr.Recognizer()
-                                mic = sr.Microphone(device_index=5)
+                                mic = sr.Microphone(device_index=2)
                                 response = recognize_speech_from_mic(recognizer, mic)
                                 response2 = response['transcription']
-                                if response2 == moviename:  # snow 또는 now 또는 none 등등 예외를 많이 만들어놓기!!! 음성인식 정확도 %의 기준이 될것
-                                    print(response2)
-                                    p.kill()
+                                
+                                correct = selectname(randnumb, response2)
+                                print (response)
+                                print (response2)
+                                print (correct)
+                                print("발음해야 할 단어 : " + randname)
+                                if correct == 1:
+                                    print response2," >> 변환인식완료 >> ",randname
+                                    #p.kill()
                                     break
                                 else:
-                                    print(response2)
+                                    print response2," >> 다시 시도해주세요"
+                            print( "빠져나옴")
+                            cv2.destroyAllWindows()
 
                             # pygame.display.set_caption('second video!')
                             clip2_resized.preview()  # 작은화면 디버깅시 이용

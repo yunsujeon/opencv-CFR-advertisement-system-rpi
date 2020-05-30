@@ -7,7 +7,6 @@ import requests
 import cv2
 import numpy as np
 import json
-import subprocess
 import speech_recognition as sr
 import pygame
 from moviepy.editor import VideoFileClip
@@ -84,56 +83,44 @@ def recognize_speech_from_mic(recognizer, microphone):
 #        return ''
 
 def selectname(randnumb, response2):
-    print ("랜덤한 숫자 : "),randnumb
-    print ("실제로 음성 인식한 내용 : "),response2
-    correct = 2 
-    if (randnumb==0):
-        print("걸렸네1")
-        if(response2 ==('navigation' or 'vacation' or 'delegation' or 'randiation' or 'navigate' or 'Asian' or 'dedication' or 'definition' or 'litigation' or 'baby Asian' or 'reggaeton' or 'meditation' or 'vision' or 'Nick Cannon')):
+    print("랜덤한 숫자 : "), randnumb
+    print("실제로 음성 인식한 내용 : "), response2
+    correct = 2
+
+    if (randnumb == 0):
+        if response2 in ('navigation', 'vacation', 'delegation', 'randiation', 'navigate', 'Asian', 'dedication', 'definition', 'litigation', 'baby Asian', 'reggaeton', 'meditation', 'vision', 'Nick Cannon'):
             correct = 1
-            print("걸렸네2")
         else:
             correct = 2
-            print("걸렸네3")
-    elif (randnumb==1):
-        if (response2 == ('happy birthday' or 'birthday' or 'divorcee' or 'North Bay' or 'Thursday' or 'PRCA' or 'Weber State')):
+    elif (randnumb == 1):
+        if response2 in ('happy birthday', 'birthday', 'divorcee', 'North Bay', 'Thursday', 'PRCA', 'Weber State'):
             correct = 1
-            print("걸렸네4")
-        else :
+        else:
             correct = 2
-            print("걸렸네5")
-    elif (randnumb==2):
-        if (response2 ==('English' or 'ego-C' or 'ngozi' or 'Melissa' or 'NBC' or 'Embassy' or 'Blissey' or 'Khaleesi' or 'Chrissy' or "English C" or 'sushi' or 'Gracie')):
+    elif (randnumb == 2):
+        if response2 in ('English', 'ego-C', 'ngozi', 'Melissa', 'NBC', 'Embassy', 'Blissey', 'Khaleesi', 'Chrissy', "English C", 'sushi', 'Gracie'):
             correct = 1
-            print("걸렸네6")
-        else :
+        else:
             correct = 2
-            print("걸렸네7")
-    elif (randnumb==3):
-        if (response2 == ('Museum' or 'medium' or 'idiom' or 'wake me up at' or 'video' or 'continuum' or 'rhenium' or 'resume' or 'iridium' or 'lithium' or 'potassium') ):
+    elif (randnumb == 3):
+        if response2 in ('Museum', 'medium', 'idiom', 'wake me up at', 'video', 'continuum', 'rhenium', 'resume', 'iridium', 'lithium', 'potassium'):
             correct = 1
-            print("걸렸네8")
-        else :
+        else:
             correct = 2
-            print("걸렸네9")
-    elif (randnumb==4):
-        if (response2 == ('Coca-Cola' or 'Aquila' or 'koala' or 'popular' or 'Opera' or 'kookaburra' or 'Pablo' or 'Buffalo')):
+    elif (randnumb == 4):
+        if response2 in ('Coca-Cola', 'Aquila', 'koala', 'popular', 'Opera', 'kookaburra', 'Pablo', 'Buffalo'):
             correct = 1
-            print("걸렸네10")
-        else :
+        else:
             correct = 2
-            print("걸렸네11")
-    elif (randnumb==5):
-        if (response2 == ('Hawaii' or 'hi' or 'how are you')):
+    elif (randnumb == 5):
+        if response2 in ('Hawaii', 'hi', 'how are you'):
             correct = 1
-            print("걸렸네12")
-        else :
+        else:
             correct = 2
-            print("걸렸네13")
-    else :
-        print ("please say again")
+    else:
+        print("please say again")
     return correct
-        
+
 def facerecog(faceposes, agelens, firstages, facegenders):
     cell= None
     start=0
@@ -350,7 +337,7 @@ while True:
                             cv2.moveWindow(window_name, width, height)
                             cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
                             cv2.imshow(window_name, image)
-                            cv2.waitKey(100)
+                            cv2.waitKey(500)
                             
                             while True:
                                 recognizer = sr.Recognizer()
