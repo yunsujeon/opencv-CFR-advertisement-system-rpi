@@ -14,6 +14,7 @@ from moviepy.editor import VideoFileClip
 import pyautogui
 import openpyxl
 import random
+import time
 #from moviepy.video.fx.resize import resize
 try:
     import Image
@@ -85,15 +86,16 @@ def recognize_speech_from_mic(recognizer, microphone):
 def selectname(randnumb, response2):
     print("랜덤한 숫자 : "), randnumb
     print("실제로 음성 인식한 내용 : "), response2
-    correct = 2
-
+    #correct = 2
+    correct = 1
+    """
     if (randnumb == 0):
         if response2 in ('navigation', 'vacation', 'delegation', 'randiation', 'navigate', 'Asian', 'dedication', 'definition', 'litigation', 'baby Asian', 'reggaeton', 'meditation', 'vision', 'Nick Cannon'):
             correct = 1
         else:
             correct = 2
     elif (randnumb == 1):
-        if response2 in ('happy birthday', 'birthday', 'divorcee', 'North Bay', 'Thursday', 'PRCA', 'Weber State'):
+        if response2 in ('happy birthday.','Pat Metheny', 'happy birthday', 'birthday', 'divorcee', 'North Bay', 'Thursday', 'PRCA', 'Weber State'):
             correct = 1
         else:
             correct = 2
@@ -116,9 +118,9 @@ def selectname(randnumb, response2):
         if response2 in ('Hawaii', 'hi', 'how are you'):
             correct = 1
         else:
-            correct = 2
+           correct = 1
     else:
-        print("please say again")
+        print("please say again")"""
     return correct
 
 def facerecog(faceposes, agelens, firstages, facegenders):
@@ -130,7 +132,7 @@ def facerecog(faceposes, agelens, firstages, facegenders):
     if faceposes=='100' or agelens =='100' or firstages=='100' or facegenders=='100':
         faceposenum = 2
         print ("recognize face error")
-    elif faceposes == "frontal_face" or "left_face" or "right_face" or "rotate_face" :
+    elif faceposes == "frontal_face"or"rotate_face" or "left_face" or "right_face" :
         faceposenum = 1
         if iagelens is 5:
             if ifirstages is 1:
@@ -196,7 +198,7 @@ def facerecog(faceposes, agelens, firstages, facegenders):
                     selectnum = 28
                     start = 3
                     end = 62
-        if iagelens < 5:
+        elif iagelens < 5:
             if -1 < ifirstages < 10:
                 if facegenders == ("male"or"child"): #남자 0대
                     selectnum = 21
@@ -269,7 +271,7 @@ while True:
 
                 if framenum == 3:  # 처음 얼굴을 인식했을 때 말고 시간이 약간 지난 후의 x 번째 프레임을 캡쳐한다.
                     cv2.rectangle(ori, (x, y), (x + w, y + h), color[0], thickness=3)
-                    cv2.imshow('video', ori)
+                    #cv2.imshow('video', ori)
 
                     # crop = ori[y + 3:y + h - 3, x + 3:x + w - 3] #크롭이미지로 이미지 판별 빨간 줄은 저장하지않도록 선의 굵기만큼 빼고 더한다.
                     # imgpath = ('C:/Users/dbstn/Desktop/nene/cropimg%d.jpg' % (imgnum))
@@ -322,17 +324,22 @@ while True:
                             clip2_resized = clip2.resize(height=height-20, width=width)
                             #pygame.display.set_mode((width,height))
                             #pygame.display.set_caption('first video!')
-                            clip1_resized.preview()  # 작은화면 디버깅시 이용
+                            
+                            #clip1_resized.preview()  # 작은화면 디버깅시 이용
+                            
+                            clip1_resized.preview(fullscreen=True)
+                            
                             #clip1.preview(fullscreen=True)
                             #clip1_resized.close()
                             pygame.quit()
                             #p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE,shell=True)
                             width, height = pyautogui.size()
+                            novoiceimg = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/again.PNG')
                             image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/'+randname+'.jpg')
                             #cv2.imshow('image',image)
                             #cv2.waitKey(1)
                             print ("발음해야 할 단어 : " + randname)
-                            window_name = 'projector'
+                            window_name = 'projector1'
                             cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
                             cv2.moveWindow(window_name, width, height)
                             cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
@@ -351,15 +358,35 @@ while True:
                                 print("발음해야 할 단어 : " + randname)
                                 if correct == 1: 
                                     print response2," >> 변환인식완료 >> ",randname
+                                    cv2.destroyAllWindows()
                                     #p.kill()
                                     break
                                 else:
                                     print response2," >> 다시 시도해주세요"
-                            print( "빠져나옴")        
-                            cv2.destroyAllWindows()
+                                    cv2.destroyAllWindows()
+                                    window_name = 'projector2'
+                                    cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                                    cv2.moveWindow(window_name, width, height)
+                                    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+                                    cv2.imshow(window_name, novoiceimg)
+                                    cv2.waitKey(1500)
+                                    cv2.destroyAllWindows()
+                                    
+                                    window_name = 'projector3'
+                                    cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                                    cv2.moveWindow(window_name, width, height)
+                                    cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+                                    cv2.imshow(window_name, image)
+                                    cv2.waitKey(100)
+
+
 
                             #pygame.display.set_caption('second video!')
-                            clip2_resized.preview()  # 작은화면 디버깅시 이용
+                            
+                            #clip2_resized.preview()  # 작은화면 디버깅시 이용
+                            
+                            clip2_resized.preview(fullscreen=True)
+                            
                             # clip2.preview(fullscreen=True)
                             pygame.quit()
                             #clip2_resized.close()

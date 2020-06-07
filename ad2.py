@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-# import time
-# import numpy as np
-# import moviepy
-# from moviepy.editor import *
-# from moviepy.video.fx.resize import resize # 이런식으로 가져오면 시간을 줄일 수 있음
-# from pygame.locals import *
 import requests
 import cv2
 import json
@@ -38,16 +32,15 @@ imgnum = 0
 width, height = pyautogui.size()
 print(width)
 print(height)
-#pygame.init()  # 라이브러리 초기화 안해줘도 되긴함
+#pygame.init()  #pygame 초기화
 
+#음성인식 함수
 def recognize_speech_from_mic(recognizer, microphone):
-    # check that recognizer and microphone arguments are appropriate type
     if not isinstance(recognizer, sr.Recognizer):
         raise TypeError("`recognizer` must be `Recognizer` instance")
     if not isinstance(microphone, sr.Microphone):
         raise TypeError("`microphone` must be `Microphone` instance")
-# adjust the recognizer sensitivity to ambient noise and record audio
-# from the microphone
+    #마이크 입력
     with microphone as source:
         recognizer.adjust_for_ambient_noise(source,duration=1)
         print ("Say something!")
@@ -62,14 +55,13 @@ def recognize_speech_from_mic(recognizer, microphone):
     try:
         response["transcription"] = recognizer.recognize_google(audio)
     except sr.RequestError:
-        # API was unreachable or unresponsive
         response["success"] = False
         response["error"] = "API unavailable"
     except sr.UnknownValueError:
-        # speech was unintelligible
         response["error"] = "Unable to recognize speech"
     return response
 
+#음성인식 범위 넓혀주는 함수
 def selectname(randnumb, response2):
     print("랜덤한 숫자 : "), randnumb
     print("실제로 음성 인식한 내용 : "), response2
@@ -109,6 +101,7 @@ def selectname(randnumb, response2):
         print("please say again")
     return correct
 
+#분류된 조건에 따라 영상 랜덤으로 골라주는 함수
 def facerecog(facepose, smale, sfemale, max_male, max_female, facegender):
     cell = None
     start = 0
@@ -116,7 +109,7 @@ def facerecog(facepose, smale, sfemale, max_male, max_female, facegender):
     if facepose=='100' or smale == '100' or sfemale =='100' or max_male =='100' or max_female=='100' or facegender=='100':
         faceposenum = 2
         print ("recognize face error")
-    if facepose == "frontal_face" or "left_face" or "right_face" or "rotate_face" : #여러명일때 facepose는 좀 이상한 감이 있지만..
+    elif facepose == "frontal_face" or "left_face" or "right_face" or "rotate_face" :
         faceposenum = 1
         if smale > sfemale :
             if max_male == 0:
@@ -190,8 +183,6 @@ def facerecog(facepose, smale, sfemale, max_male, max_female, facegender):
 
     while cell is None:
         if faceposenum == 1:
-            print(start)
-            print(end)
             if start <= end:
                 manrownum = random.randrange(start, end)
             else :
@@ -211,6 +202,7 @@ while True:
     else:
         framenum = framenum + 1
 
+    #stt이미지 랜덤으로 선택해줌
     randnumb = random.randrange(0,6)
     if randnumb == 0:
         randname = 'navigation'
@@ -234,19 +226,19 @@ while True:
             img_gray = cv2.cvtColor(ori, cv2.COLOR_BGR2GRAY)
             cascade_file = "/home/pi/projects/opencv-CFR-advertisement-system-rpi/haarcascade_frontalface_default.xml"  # https://github.com/opencv/opencv/tree/master/data/haarcascades xml파일 다운경로
             cascade = cv2.CascadeClassifier(cascade_file)
-            face_list = cascade.detectMultiScale(img_gray, scaleFactor=1.1, minNeighbors=3, minSize=(50, 50))  # 가까이있는 얼굴 인식하고싶어서 150으로 올려둠 멀리있는 얼굴 인식하려면 낮추기
+            face_list = cascade.detectMultiScale(img_gray, scaleFactor=1.1, minNeighbors=3, minSize=(50, 50))  # 가까이있는 얼굴만 인식하려면 숫자 올리기
 
-            if len(face_list) > 0:  # face가 없을때도 코드가 돌아야 되는데... 뒤에 else 문 채워주기
+            if len(face_list) > 0:
                 print(face_list)
                 color = [(0, 0, 255), (0, 255, 0)]
                 for face in face_list:
                     x, y, w, h = face
-				# cv2.rectangle(frame, (x, y), (x + w, y + h), color[0], thickness=3) #n번째가 아닌 인식되는 즉시 즉시를 보려면 이 코드 사용
-				# cv2.imshow('video', frame)
+		    # cv2.rectangle(frame, (x, y), (x + w, y + h), color[0], thickness=3) #n번째가 아닌 인식되는 즉시 즉시를 보려면 이 코드 사용
+		    # cv2.imshow('video', frame)
 
-                if framenum == 3:  # 처음 얼굴을 인식했을 때 말고 시간이 약간 지난 후의 x 번째 프레임을 캡쳐한다.
+                if framenum == 3:  # 실험 결과 세번재 프레임을 사용
                     cv2.rectangle(ori, (x, y), (x + w, y + h), color[0], thickness=3)
-                    cv2.imshow('video', ori)
+                    #cv2.imshow('video', ori)
 
                     #crop = ori[y + 5:y + h - 5, x + 5:x + w - 5]  # 크롭이미지로 이미지 판별 빨간 줄은 저장하지않도록 선의 굵기만큼 빼고 더한다.
                     #imgpath = ('C:/Users/dbstn/Desktop/nene/cropimg%d.jpg' % (imgnum))
@@ -257,7 +249,6 @@ while True:
                     imgnum = imgnum + 1
                     cv2.imwrite(imgpath, crop)
                     files = {'image': open(imgpath, 'rb')}
-					# 파일을 저장하지 않고 바로 쓸수는 없는지 생각해보기 files = frame 으로 하면 안되더라.
 
                     headers = {'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret}
                     response = requests.post(url, files=files, headers=headers)
@@ -294,7 +285,9 @@ while True:
                             #age is under 10
                             else:
                                 average_age.append(int(faceage[i][0]) + 2)
-                        
+                            
+                            print(average_age[i])
+
                         male = [0, 0, 0, 0, 0, 0, 0, 0, 0]
                         female = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -383,6 +376,7 @@ while True:
                         smale = math.ceil(smale)
                         sfemale = sum(female)
                         sfemale = math.ceil(sfemale)
+                        sgen = smale + sfemale
                         print(male, female) # 남 녀 배열
                         print(smale, sfemale) # 남자 수 여자 수
                         print(max_male, max_female) # 성별별로 가장 많은 나이대
@@ -394,44 +388,44 @@ while True:
                             cel = cel[:-4]
                             clip1 = VideoFileClip('/home/pi/Downloads/'+cel+'1'+'.mp4')
                             clip2 = VideoFileClip('/home/pi/Downloads/'+cel+'2'+'.mp4')
-                            clip1_resized = clip1.resize(height=height, width=width)
-                            clip2_resized = clip1.resize(height=height, width=width)
+                            clip1_resized = clip1.resize(height=height-20, width=width)
+                            clip2_resized = clip2.resize(height=height-20, width=width)
                             # pygame.display.set_caption('first video!')
-                            clip1_resized.preview()  # 작은화면 디버깅시 이용
-                            # clip1.preview(fullscreen=True) # 모든화면에서 풀스크린으로 되면 하기 but 팅기더라
+                            clip1_resized.preview(fullscreen=True) 
+                            # clip1.preview() 
                             pygame.quit()
-                            #p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE, shell=True)
-                            width, height = pyautogui.size()
-                            image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/'+randname+'.jpg')
-                            #cv2.imshow('image',image)
-                            #cv2.waitKey(1)
-                            print ("발음해야 할 단어 : " + randname)
-                            window_name = 'projector'
-                            cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
-                            cv2.moveWindow(window_name, width, height)
-                            cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
-                            cv2.imshow(window_name, image)
-                            cv2.waitKey(500)
+                            
+                            if sgen == 1: #인식된 사람이 한 명일때는 음성인식, stt이미지
+                                #p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE, shell=True)
+                                width, height = pyautogui.size()
+                                image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/'+randname+'.jpg')
+                                #cv2.imshow('image',image)
+                                #cv2.waitKey(1)
+                                print ("발음해야 할 단어 : " + randname)
+                                window_name = 'projector'
+                                cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                                cv2.moveWindow(window_name, width, height)
+                                cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+                                cv2.imshow(window_name, image)
+                                cv2.waitKey(500)
 
-                            while True:
-                                recognizer = sr.Recognizer()
-                                mic = sr.Microphone(device_index=2)
-                                response = recognize_speech_from_mic(recognizer, mic)
-                                response2 = response['transcription']
-                                
-                                correct = selectname(randnumb, response2)
-                                print (response)
-                                print (response2)
-                                print (correct)
-                                print("발음해야 할 단어 : " + randname)
-                                if correct == 1:
-                                    print response2," >> 변환인식완료 >> ",randname
-                                    #p.kill()
-                                    break
-                                else:
-                                    print response2," >> 다시 시도해주세요"
-                            print( "빠져나옴")
-                            cv2.destroyAllWindows()
+                                while True:
+                                    recognizer = sr.Recognizer()
+                                    mic = sr.Microphone(device_index=2)
+                                    response = recognize_speech_from_mic(recognizer, mic)
+                                    response2 = response['transcription']
+                                    correct = selectname(randnumb, response2)
+                                    print (response)
+                                    print (response2)
+                                    print (correct)
+                                    print("발음해야 할 단어 : " + randname)
+                                    if correct == 1:
+                                        print response2," >> 변환인식완료 >> ",randname
+                                        #p.kill()
+                                        break
+                                    else:
+                                        print response2," >> 다시 시도해주세요"
+                                cv2.destroyAllWindows()
 
                             # pygame.display.set_caption('second video!')
                             clip2_resized.preview()  # 작은화면 디버깅시 이용

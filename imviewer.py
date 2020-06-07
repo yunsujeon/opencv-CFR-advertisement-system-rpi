@@ -6,7 +6,7 @@ import time
 screen_id = 0
 
 width, height = pyautogui.size()
-image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/snow.png')
+image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/cocacola.jpg')
 
 #cv2.imshow('image',image)
 #cv2.waitKey(1000)
