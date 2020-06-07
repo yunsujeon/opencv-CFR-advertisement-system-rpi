@@ -428,7 +428,7 @@ while True:
                                 cv2.destroyAllWindows()
 
                             # pygame.display.set_caption('second video!')
-                            clip2_resized.preview()  # 작은화면 디버깅시 이용
+                            clip2_resized.preview(fullscreen=True)  # 작은화면 디버깅시 이용
                             # clip2.preview(fullscreen=True)
                             pygame.quit()
                             # clip2.close() # clip1.close 등 moviepy 명령어인 close 쓰니깐 느림. 팅기는 현상
