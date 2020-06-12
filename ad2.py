@@ -443,13 +443,8 @@ while True:
                                         cv2.imshow(window_name, image)
                                         cv2.waitKey(100)
 
-
                             # pygame.display.set_caption('second video!')
-<<<<<<< HEAD
-                            clip2_resized.preview(fullscreen=True)
-=======
                             clip2_resized.preview(fullscreen=True)  # 작은화면 디버깅시 이용
->>>>>>> 08aa95e91bf50e5175eda61f3638f254cd6c5b0d
                             # clip2.preview(fullscreen=True)
                             pygame.quit()
                             # clip2.close() # clip1.close 등 moviepy 명령어인 close 쓰니깐 느림. 팅기는 현상
@@ -461,7 +456,6 @@ while True:
                                 cv2.imshow(window_name, qrimage)
                                 cv2.waitKey(8000)
                                 cv2.destroyAllWindows()
-                        
                         
                         else :
                             print ("facepose error")
