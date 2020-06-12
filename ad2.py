@@ -333,7 +333,6 @@ while True:
                             else:
                                 if 1 <= average_age[i] < 10: #child일경우.10대이상부턴 오류이기 때문에  의미로 1이 아닌 조정된 가중치인 0.5를 부여
                                     male[0] += 1
-                                    female[0] += 1
                                 elif 10 <= average_age[i] < 20:
                                     male[1] += 0.5
                                     female[1] += 0.5
@@ -373,10 +372,10 @@ while True:
                                 max_female = -1
 
                         smale = sum(male)
-                        smale = math.ceil(smale)
+                        #smale = math.ceil(smale)#굳이 정수일 필요가없네
                         sfemale = sum(female)
-                        sfemale = math.ceil(sfemale)
-                        sgen = smale + sfemale
+                        #sfemale = math.ceil(sfemale)
+                        sgen = smale + sfemale#한명인데 0.5+0.5=2 나왔었다. ceil때문에
                         print(male, female) # 남 녀 배열
                         print(smale, sfemale) # 남자 수 여자 수
                         print(max_male, max_female) # 성별별로 가장 많은 나이대
@@ -399,6 +398,8 @@ while True:
                                 #p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE, shell=True)
                                 width, height = pyautogui.size()
                                 image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/'+randname+'.jpg')
+                                noviceimg = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/again.png')
+                                qrimage = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/qrcodefull.png')
                                 #cv2.imshow('image',image)
                                 #cv2.waitKey(1)
                                 print ("발음해야 할 단어 : " + randname)
@@ -421,17 +422,43 @@ while True:
                                     print("발음해야 할 단어 : " + randname)
                                     if correct == 1:
                                         print response2," >> 변환인식완료 >> ",randname
+                                        cv2.destroyAllWindows()
                                         #p.kill()
                                         break
                                     else:
                                         print response2," >> 다시 시도해주세요"
-                                cv2.destroyAllWindows()
+                                        cv2.destroyAllWindows()
+                                        window_name = 'projector2'
+                                        cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                                        cv2.moveWindow(window_name, width, height)
+                                        cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+                                        cv2.imshow(window_name, novoiceimg)
+                                        cv2.waitKey(1500)
+                                        cv2.destroyAllWindows()
+
+                                        window_name = 'projector3'
+                                        cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                                        cv2.moveWindow(window_name, width, height)
+                                        cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+                                        cv2.imshow(window_name, image)
+                                        cv2.waitKey(100)
+
 
                             # pygame.display.set_caption('second video!')
-                            clip2_resized.preview(full_screen=True)  # 작은화면 디버깅시 이용
+                            clip2_resized.preview(fullscreen=True)
                             # clip2.preview(fullscreen=True)
                             pygame.quit()
                             # clip2.close() # clip1.close 등 moviepy 명령어인 close 쓰니깐 느림. 팅기는 현상
+                            if sgen == 1:
+                                window_name = 'QR'
+                                cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
+                                cv2.moveWindow(window_name, width, height)
+                                cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+                                cv2.imshow(window_name, qrimage)
+                                cv2.waitKey(8000)
+                                cv2.destroyAllWindows()
+                        
+                        
                         else :
                             print ("facepose error")
                     else:
