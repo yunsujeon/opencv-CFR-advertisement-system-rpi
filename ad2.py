@@ -68,7 +68,7 @@ def selectname(randnumb, response2):
     correct = 2
 
     if (randnumb == 0):
-        if response2 in ('navigation', 'vacation', 'delegation', 'randiation', 'navigate', 'Asian', 'dedication', 'definition', 'litigation', 'baby Asian', 'reggaeton', 'meditation', 'vision', 'Nick Cannon'):
+        if response2 in ('navigation', 'vacation', 'delegation', 'randiation', 'navigate', 'Asian', 'dedication', 'definition', 'litigation', 'baby Asian', 'reggaeton', 'meditation', 'vision', 'Nick Cannon','Galen'):
             correct = 1
         else:
             correct = 2
@@ -99,6 +99,7 @@ def selectname(randnumb, response2):
             correct = 2
     else:
         print("please say again")
+    #correct = 1
     return correct
 
 #분류된 조건에 따라 영상 랜덤으로 골라주는 함수
@@ -227,7 +228,6 @@ while True:
             cascade_file = "/home/pi/projects/opencv-CFR-advertisement-system-rpi/haarcascade_frontalface_default.xml"  # https://github.com/opencv/opencv/tree/master/data/haarcascades xml파일 다운경로
             cascade = cv2.CascadeClassifier(cascade_file)
             face_list = cascade.detectMultiScale(img_gray, scaleFactor=1.1, minNeighbors=3, minSize=(50, 50))  # 가까이있는 얼굴만 인식하려면 숫자 올리기
-
             if len(face_list) > 0:
                 print(face_list)
                 color = [(0, 0, 255), (0, 255, 0)]
@@ -235,8 +235,7 @@ while True:
                     x, y, w, h = face
 		    # cv2.rectangle(frame, (x, y), (x + w, y + h), color[0], thickness=3) #n번째가 아닌 인식되는 즉시 즉시를 보려면 이 코드 사용
 		    # cv2.imshow('video', frame)
-
-                if framenum == 3:  # 실험 결과 세번재 프레임을 사용
+                if framenum == 3:  # 실험 결과 세번재 프레임을 사용 0 1 2
                     cv2.rectangle(ori, (x, y), (x + w, y + h), color[0], thickness=3)
                     #cv2.imshow('video', ori)
 
@@ -253,7 +252,6 @@ while True:
                     headers = {'X-Naver-Client-Id': client_id, 'X-Naver-Client-Secret': client_secret}
                     response = requests.post(url, files=files, headers=headers)
                     rescode = response.status_code
-
                     if (rescode == 200):
                         facepose = '100'
                         smale = '100'
@@ -387,8 +385,10 @@ while True:
                             cel = cel[:-4]
                             clip1 = VideoFileClip('/home/pi/Downloads/'+cel+'1'+'.mp4')
                             clip2 = VideoFileClip('/home/pi/Downloads/'+cel+'2'+'.mp4')
-                            clip1_resized = clip1.resize(height=height-20, width=width)
-                            clip2_resized = clip2.resize(height=height-20, width=width)
+                            #clip1_resized = clip1.resize(height=height, width=width)
+                            #clip2_resized = clip2.resize(height=height, width=width)
+                            clip1_resized = clip1.resize((width,height))
+                            clip2_resized = clip2.resize((width,height))
                             # pygame.display.set_caption('first video!')
                             clip1_resized.preview(fullscreen=True) 
                             # clip1.preview() 
@@ -398,7 +398,7 @@ while True:
                                 #p = subprocess.Popen('exec '+'python imviewer.py',stdout=subprocess.PIPE, shell=True)
                                 width, height = pyautogui.size()
                                 image = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/'+randname+'.jpg')
-                                noviceimg = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/again.png')
+                                novoiceimg = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/again.PNG')
                                 qrimage = cv2.imread('/home/pi/projects/opencv-CFR-advertisement-system-rpi/sst/qrcodefull.png')
                                 #cv2.imshow('image',image)
                                 #cv2.waitKey(1)
@@ -412,7 +412,7 @@ while True:
 
                                 while True:
                                     recognizer = sr.Recognizer()
-                                    mic = sr.Microphone(device_index=2)
+                                    mic = sr.Microphone(device_index=0)
                                     response = recognize_speech_from_mic(recognizer, mic)
                                     response2 = response['transcription']
                                     correct = selectname(randnumb, response2)
@@ -441,7 +441,7 @@ while True:
                                         cv2.moveWindow(window_name, width, height)
                                         cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
                                         cv2.imshow(window_name, image)
-                                        cv2.waitKey(100)
+                                        cv2.waitKey(300)
 
                             # pygame.display.set_caption('second video!')
                             clip2_resized.preview(fullscreen=True)  # 작은화면 디버깅시 이용
