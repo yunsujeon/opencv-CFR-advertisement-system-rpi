@@ -103,16 +103,16 @@ def selectname(randnumb, response2):
     return correct
 
 #분류된 조건에 따라 영상 랜덤으로 골라주는 함수
-def facerecog(facepose, sum_male, sfemale, max_male, max_female, facegender):
+def facerecog(facepose, sum_male, sum_female, max_male, max_female, facegender):
     cell = None
     start = 0
     end = 0
-    if facepose=='100' or sum_male == '100' or sfemale =='100' or max_male =='100' or max_female=='100' or facegender=='100':
+    if facepose=='100' or sum_male == '100' or sum_female =='100' or max_male =='100' or max_female=='100' or facegender=='100':
         faceposenum = 2
         print ("recognize face error")
     elif facepose == "frontal_face" or "left_face" or "right_face" or "rotate_face" :
         faceposenum = 1
-        if sum_male > sfemale :
+        if sum_male > sum_female :
             if max_male == 0:
                 selectnum = 21
                 start = 3
@@ -145,7 +145,7 @@ def facerecog(facepose, sum_male, sfemale, max_male, max_female, facegender):
                 selectnum = 28
                 start = 3
                 end = 27
-        elif sum_male <= sfemale :
+        elif sum_male <= sum_female :
             if max_female == 0:
                 selectnum = 21
                 start = 3
@@ -255,7 +255,7 @@ while True:
                     if (rescode == 200):
                         facepose = '100'
                         sum_male = '100'
-                        sfemale = '100'
+                        sum_female = '100'
                         max_male = '100'
                         max_female = '100'
                         facegender = []
@@ -371,14 +371,14 @@ while True:
 
                         sum_male = sum(male)
                         #sum_male = math.ceil(sum_male)#굳이 정수일 필요가없네
-                        sfemale = sum(female)
-                        #sfemale = math.ceil(sfemale)
-                        sgen = sum_male + sfemale#한명인데 0.5+0.5=2 나왔었다. ceil때문에
+                        sum_female = sum(female)
+                        #sum_female = math.ceil(sum_female)
+                        sgen = sum_male + sum_female#한명인데 0.5+0.5=2 나왔었다. ceil때문에
                         print(male, female) # 남 녀 배열
-                        print(sum_male, sfemale) # 남자 수 여자 수
+                        print(sum_male, sum_female) # 남자 수 여자 수
                         print(max_male, max_female) # 성별별로 가장 많은 나이대
 
-                        cel, err = facerecog(facepose, sum_male, sfemale, max_male, max_female, facegender)
+                        cel, err = facerecog(facepose, sum_male, sum_female, max_male, max_female, facegender)
 
                         if err == 0 :
                             print(cel)
