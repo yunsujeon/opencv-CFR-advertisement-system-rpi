@@ -62,38 +62,38 @@ def recognize_speech_from_mic(recognizer, microphone):
     return response
 
 #음성인식 범위 넓혀주는 함수
-def selectname(randnumb, response2):
+def selectname(randnumb, new_response):
     print("랜덤한 숫자 : "), randnumb
-    print("실제로 음성 인식한 내용 : "), response2
+    print("실제로 음성 인식한 내용 : "), new_response
     correct = 2
 
     if (randnumb == 0):
-        if response2 in ('navigation', 'vacation', 'delegation', 'randiation', 'navigate', 'Asian', 'dedication', 'definition', 'litigation', 'baby Asian', 'reggaeton', 'meditation', 'vision', 'Nick Cannon','Galen'):
+        if new_response in ('navigation', 'vacation', 'delegation', 'randiation', 'navigate', 'Asian', 'dedication', 'definition', 'litigation', 'baby Asian', 'reggaeton', 'meditation', 'vision', 'Nick Cannon','Galen'):
             correct = 1
         else:
             correct = 2
     elif (randnumb == 1):
-        if response2 in ('happy birthday', 'birthday', 'divorcee', 'North Bay', 'Thursday', 'PRCA', 'Weber State'):
+        if new_response in ('happy birthday', 'birthday', 'divorcee', 'North Bay', 'Thursday', 'PRCA', 'Weber State'):
             correct = 1
         else:
             correct = 2
     elif (randnumb == 2):
-        if response2 in ('English', 'ego-C', 'ngozi', 'Melissa', 'NBC', 'Embassy', 'Blissey', 'Khaleesi', 'Chrissy', "English C", 'sushi', 'Gracie'):
+        if new_response in ('English', 'ego-C', 'ngozi', 'Melissa', 'NBC', 'Embassy', 'Blissey', 'Khaleesi', 'Chrissy', "English C", 'sushi', 'Gracie'):
             correct = 1
         else:
             correct = 2
     elif (randnumb == 3):
-        if response2 in ('Museum', 'medium', 'idiom', 'wake me up at', 'video', 'continuum', 'rhenium', 'resume', 'iridium', 'lithium', 'potassium'):
+        if new_response in ('Museum', 'medium', 'idiom', 'wake me up at', 'video', 'continuum', 'rhenium', 'resume', 'iridium', 'lithium', 'potassium'):
             correct = 1
         else:
             correct = 2
     elif (randnumb == 4):
-        if response2 in ('Coca-Cola', 'Aquila', 'koala', 'popular', 'Opera', 'kookaburra', 'Pablo', 'Buffalo'):
+        if new_response in ('Coca-Cola', 'Aquila', 'koala', 'popular', 'Opera', 'kookaburra', 'Pablo', 'Buffalo'):
             correct = 1
         else:
             correct = 2
     elif (randnumb == 5):
-        if response2 in ('Hawaii', 'hi', 'how are you'):
+        if new_response in ('Hawaii', 'hi', 'how are you'):
             correct = 1
         else:
             correct = 2
@@ -414,19 +414,19 @@ while True:
                                     recognizer = sr.Recognizer()
                                     mic = sr.Microphone(device_index=0)
                                     response = recognize_speech_from_mic(recognizer, mic)
-                                    response2 = response['transcription']
-                                    correct = selectname(randnumb, response2)
+                                    new_response = response['transcription']
+                                    correct = selectname(randnumb, new_response)
                                     print (response)
-                                    print (response2)
+                                    print (new_response)
                                     print (correct)
                                     print("발음해야 할 단어 : " + randname)
                                     if correct == 1:
-                                        print response2," >> 변환인식완료 >> ",randname
+                                        print new_response," >> 변환인식완료 >> ",randname
                                         cv2.destroyAllWindows()
                                         #p.kill()
                                         break
                                     else:
-                                        print response2," >> 다시 시도해주세요"
+                                        print new_response," >> 다시 시도해주세요"
                                         cv2.destroyAllWindows()
                                         window_name = 'projector2'
                                         cv2.namedWindow(window_name, cv2.WND_PROP_FULLSCREEN)
