@@ -10,6 +10,14 @@ opencv 와 cfr을 이용한 지역광고시스템
 
 라즈베리파이, hdmi 케이블, 거치대, 모니터, 카메라, 마이크
 
+### Software, language
+
+python
+moviepy
+opencv
+pygame
+...etc
+
 ### How to use
 
 얼굴이 가까이 가게되면 나이대와 성별 인식하고 그에 맞는 광고를 송출함
@@ -19,7 +27,8 @@ opencv 와 cfr을 이용한 지역광고시스템
 
 ### Analysis Data
 
-ppt 올려놓기
+분석한 ppt 올려놓기
+엑셀을 통해 영상 분석한 자료가 있다.
 
 ### After plan
 
